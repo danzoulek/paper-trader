@@ -25,7 +25,8 @@ so it is safe to run every 30 minutes.
 ## Try it
 
 ```bash
-python -m unittest tests.test_trader            # 12 tests
+python -m unittest tests.test_trader            # paper bot tests
+python -m unittest tests.test_plan               # live-plan tests
 python -m trader.run --force --simulated        # made-up prices, no account
 ```
 
@@ -48,6 +49,15 @@ A cron line on any always-on machine works too:
 ```
 (set the machine's timezone to America/New_York, or adjust the hours).
 
+## Real money (switched off)
+
+`trader/plan.py` is a decide-only mode for a Robinhood agentic account: it
+turns the account's holdings into a plan of dollar-based orders, checks them
+against hard limits (`live` in `config.json`), and never places anything
+itself. A scheduled Claude task would place the planned orders through the
+Robinhood connector; its instructions are in `LIVE_TASK.md`. With
+`live.enabled` false (the default) every plan is a `dry_run`.
+
 ## Settings (`config.json`)
 
 | Key | Default | Meaning |
@@ -59,6 +69,11 @@ A cron line on any always-on machine works too:
 | `risk.stop_loss_pct` | 0.08 | Sell a holding 8% below its cost |
 | `risk.max_daily_loss_pct` | 0.03 | Go to cash for the day after a 3% drop |
 | `starting_cash` | 10000 | Local paper account only |
+| `live.enabled` | false | Must be true before any real order |
+| `live.account_number` | empty | Your agentic account; must be filled in by you |
+| `live.max_account_dollars` | 500 | Plans size against at most this much |
+| `live.max_order_dollars` | 150 | Largest single buy |
+| `live.max_orders_per_run` | 8 | More than this blocks the whole plan |
 
 ## Files
 
@@ -67,4 +82,6 @@ A cron line on any always-on machine works too:
 - `trader/strategy.py`: strategies (add new ones to `STRATEGIES`)
 - `trader/risk.py`: position caps, stops, daily loss limit, order planning
 - `trader/broker.py`: local and Alpaca paper brokers
-- `trader/run.py`: one trading pass
+- `trader/run.py`: one paper trading pass
+- `trader/plan.py`: decide-only plan for the agentic account
+- `LIVE_TASK.md`: instructions for the (not yet scheduled) live task
