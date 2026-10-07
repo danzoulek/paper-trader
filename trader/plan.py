@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 from . import risk
-from .data import make_data_source
+from .data import FileData, make_data_source
 from .market_hours import NY, is_market_open
 from .strategy import target_weights
 
@@ -131,10 +131,12 @@ def main():
     ap.add_argument("--holdings", required=True)
     ap.add_argument("--out", default="plan.json")
     ap.add_argument("--config", default=str(ROOT / "config.json"))
+    ap.add_argument("--market-data", help="JSON file of closes and prices to use instead of the web")
     a = ap.parse_args()
     cfg = json.loads(Path(a.config).read_text())
     holdings = json.loads(Path(a.holdings).read_text())
-    plan = make_plan(cfg, holdings, make_data_source(cfg["data_source"]))
+    data = FileData(a.market_data) if a.market_data else make_data_source(cfg["data_source"])
+    plan = make_plan(cfg, holdings, data)
     Path(a.out).write_text(json.dumps(plan, indent=2))
     print(f"Status: {plan['status']}")
     for o in plan["orders"]:

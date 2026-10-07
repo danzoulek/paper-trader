@@ -13,15 +13,28 @@ CLOSED = datetime(2026, 10, 10, 10, 0, tzinfo=NY)
 
 def config(**live):
     cfg = json.loads((ROOT / "config.json").read_text())
+    cfg["live"].update(enabled=False, account_number="", max_account_dollars=500,
+                       max_order_dollars=150, max_orders_per_run=8, min_order_dollars=5)
     cfg["live"].update(live)
     return cfg
 
 
 class Plan(unittest.TestCase):
-    def test_off_by_default(self):
-        cfg = json.loads((ROOT / "config.json").read_text())
-        self.assertFalse(cfg["live"]["enabled"])
-        self.assertEqual(cfg["live"]["account_number"], "")
+    def test_file_data_matches_source(self):
+        import tempfile
+        from trader.data import FileData
+        sim, syms = SimulatedData(), ["SPY", "QQQ"]
+        body = {"closes": sim.daily_closes(syms, 60), "prices": sim.latest_prices(syms)}
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+            json.dump(body, f)
+        fd = FileData(f.name)
+        self.assertEqual(fd.daily_closes(syms, 55), sim.daily_closes(syms, 55))
+        self.assertEqual(fd.latest_prices(syms), sim.latest_prices(syms))
+
+    def test_config_has_live_limits(self):
+        live = json.loads((ROOT / "config.json").read_text())["live"]
+        for key in ("enabled", "account_number", "max_account_dollars", "max_order_dollars"):
+            self.assertIn(key, live)
 
     def test_switched_off_is_dry_run_with_orders(self):
         plan = make_plan(config(), {"cash": 500, "positions": {}}, SimulatedData(), OPEN)

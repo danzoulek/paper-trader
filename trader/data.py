@@ -146,6 +146,21 @@ class FreeData:
         return self._first("latest_prices", symbols)
 
 
+class FileData:
+    """Prices from a JSON file written by someone else, e.g. the live Claude
+    task copying Robinhood's own quotes: {"closes": {sym: [...]}, "prices": {sym: p}}."""
+
+    def __init__(self, path):
+        body = json.loads(open(path).read())
+        self.closes, self.prices = body["closes"], body["prices"]
+
+    def daily_closes(self, symbols, days):
+        return {s: [float(c) for c in self.closes.get(s, [])][-days:] for s in symbols}
+
+    def latest_prices(self, symbols):
+        return {s: float(self.prices[s]) for s in symbols if s in self.prices}
+
+
 def make_data_source(name):
     if name == "free":
         return FreeData()
