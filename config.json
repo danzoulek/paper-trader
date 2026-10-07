@@ -21,7 +21,7 @@
   },
 
   "live": {
-    "enabled": false,
+    "enabled": true,
     "account_number": "860660018",
     "max_account_dollars": 500,
     "max_order_dollars": 150,
