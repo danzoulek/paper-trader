@@ -13,9 +13,15 @@ places nothing.
 
 ## Schedule
 
-Twice per market day: about 10:15 and 15:30 New York time. Not every 30
-minutes, because the account is cash-only and sale proceeds take a business
-day to settle.
+Every 30 minutes on market days, from 9:30 to 15:30 New York time (13 runs),
+as Daniel asked on 2026-10-07. The plan itself blocks any run when the market
+is closed (holidays, early closes).
+
+The account is cash-only: money from a sale settles the next business day.
+Buys spend only the buying power Robinhood reports, and a share bought with
+unsettled money shouldn't be sold before that money settles (a "good faith
+violation"). The strategy uses daily averages, so most intraday runs should
+place no orders.
 
 ## Task prompt
 
