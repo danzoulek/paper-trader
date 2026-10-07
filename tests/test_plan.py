@@ -13,7 +13,7 @@ CLOSED = datetime(2026, 10, 10, 10, 0, tzinfo=NY)
 
 def config(**live):
     cfg = json.loads((ROOT / "config.json").read_text())
-    cfg["live"].update(enabled=False, account_number="", max_account_dollars=500,
+    cfg["live"].update(enabled=False, account_number="", require_approval=False, max_account_dollars=500,
                        max_order_dollars=150, max_orders_per_run=8, min_order_dollars=5)
     cfg["live"].update(live)
     return cfg
@@ -54,6 +54,12 @@ class Plan(unittest.TestCase):
         cfg = config(enabled=True, account_number="X")
         plan = make_plan(cfg, {"cash": 40, "positions": {}}, SimulatedData(), OPEN)
         self.assertLessEqual(sum(o["dollar_amount"] for o in plan["orders"]), 40)
+
+    def test_approval_required(self):
+        cfg = config(enabled=True, account_number="X", require_approval=True)
+        holdings = {"cash": 500, "positions": {}}
+        self.assertEqual(make_plan(cfg, holdings, SimulatedData(), OPEN)["status"], "needs_approval")
+        self.assertEqual(make_plan(cfg, holdings, SimulatedData(), OPEN, approved=True)["status"], "ready")
 
     def test_enabled_without_account_is_blocked(self):
         plan = make_plan(config(enabled=True), {"cash": 500, "positions": {}}, SimulatedData(), OPEN)

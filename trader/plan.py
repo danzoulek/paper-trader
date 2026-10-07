@@ -5,7 +5,9 @@ file the scheduled Claude task writes from the Robinhood connector), runs the
 same strategy and risk rules as the paper bot, and writes a plan of dollar-
 based orders plus a status:
 
-    ready    live trading is enabled and every order passed the hard limits
+    ready           live trading is enabled and every order passed the hard limits
+    needs_approval  as ready, but live.require_approval is on and Daniel has
+                    not approved these orders yet (rerun with --approved)
     dry_run  live trading is switched off; the orders are what it WOULD do
     blocked  something failed a check; nothing may be placed
 
@@ -95,7 +97,7 @@ def check(cfg, orders, holdings):
     return problems
 
 
-def make_plan(cfg, holdings, data, now=None):
+def make_plan(cfg, holdings, data, now=None, approved=False):
     now = now or datetime.now(NY)
     closes = data.daily_closes(cfg["symbols"], cfg["strategy"]["slow_days"] + 5)
     prices = data.latest_prices(sorted(set(cfg["symbols"]) | set(holdings.get("positions", {}))))
@@ -111,6 +113,8 @@ def make_plan(cfg, holdings, data, now=None):
         status = "dry_run"
     elif not live["account_number"]:
         status, problems = "blocked", ["No agentic account number in config.json."]
+    elif live.get("require_approval", True) and not approved and orders:
+        status = "needs_approval"
     else:
         status = "ready"
     return {
@@ -131,12 +135,14 @@ def main():
     ap.add_argument("--holdings", required=True)
     ap.add_argument("--out", default="plan.json")
     ap.add_argument("--config", default=str(ROOT / "config.json"))
+    ap.add_argument("--approved", action="store_true",
+                    help="Daniel approved this run's orders (needed when live.require_approval is on)")
     ap.add_argument("--market-data", help="JSON file of closes and prices to use instead of the web")
     a = ap.parse_args()
     cfg = json.loads(Path(a.config).read_text())
     holdings = json.loads(Path(a.holdings).read_text())
     data = FileData(a.market_data) if a.market_data else make_data_source(cfg["data_source"])
-    plan = make_plan(cfg, holdings, data)
+    plan = make_plan(cfg, holdings, data, approved=a.approved)
     Path(a.out).write_text(json.dumps(plan, indent=2))
     print(f"Status: {plan['status']}")
     for o in plan["orders"]:

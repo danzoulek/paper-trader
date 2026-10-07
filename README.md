@@ -71,6 +71,7 @@ Robinhood connector; its instructions are in `LIVE_TASK.md`. With
 | `starting_cash` | 10000 | Local paper account only |
 | `live.enabled` | false | Must be true before any real order |
 | `live.account_number` | empty | Your agentic account; must be filled in by you |
+| `live.require_approval` | true | Each run's orders wait for Daniel's OK in the project thread |
 | `live.max_account_dollars` | 500 | Plans size against at most this much |
 | `live.max_order_dollars` | 150 | Largest single buy |
 | `live.max_orders_per_run` | 8 | More than this blocks the whole plan |

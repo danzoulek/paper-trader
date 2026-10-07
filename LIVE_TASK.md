@@ -6,7 +6,8 @@ It goes live only when Daniel says so, and only after he has:
 
 1. set `live.enabled` to `true` in `config.json`,
 2. put his agentic account number in `live.account_number`,
-3. turned on per-trade approval in the Robinhood app for the first weeks.
+3. kept `live.require_approval` on (Daniel approves each run's orders in the
+   thread, since the app's own trade-approval setting couldn't be found).
 
 Until then, `trader.plan` returns `dry_run` (or `blocked`) and this task
 places nothing.
@@ -46,8 +47,17 @@ place no orders.
 >    `{"closes": {"SYM": [daily closes, oldest first]}, "prices": {"SYM": <last trade price>}}`.
 >    Use only completed days in `closes` (drop today's bar if present).
 > 6. Run `python -m trader.plan --holdings holdings.json --market-data market_data.json --out plan.json`.
-> 7. If `plan.json` status is not `ready`, place nothing. Report the status,
->    the orders it would have placed and any problems, then stop.
+> 7. If `plan.json` status is `needs_approval`, place nothing yet. Post the
+>    orders to Daniel in the paper-trader thread as a decision card
+>    ("Place these orders?": Place / Skip), unless an earlier card with the
+>    same orders is still unanswered today. Only Daniel's own answer counts.
+>    When he picks Place, redo steps 3-6 with `--approved` and continue at
+>    step 8 with that fresh plan, provided its orders are the same symbols and
+>    sides as the approved card and no amount is more than 10% larger;
+>    otherwise post a new card. An approval is good for 30 minutes.
+>    If the status is anything other than `ready` or `needs_approval`, place
+>    nothing. Report the status, the orders it would have placed and any
+>    problems, then stop.
 > 8. If status is `ready`, for each order in `plan.json`, in order:
 >    - call `review_equity_order` with the same account, symbol and side,
 >      `type: "market"`, `market_hours: "regular_hours"`, and either
