@@ -1,0 +1,30 @@
+# Runs the paper trader every 30 minutes on weekdays. GitHub's schedule is in
+# UTC, so this window (13:00-20:59 UTC) covers 9:30-16:00 New York time in both
+# summer and winter; the bot itself skips runs outside market hours and on
+# exchange holidays. Prices come from free sources (Yahoo, then Stooq), so no
+# keys are needed. The simulated account lives in state/, which this job
+# commits back to the repo after each run that trades.
+name: paper-trade
+on:
+  schedule:
+    - cron: "*/30 13-20 * * 1-5"
+  workflow_dispatch:
+concurrency: paper-trade
+permissions:
+  contents: write
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest tests.test_trader
+      - run: python -m trader.run
+      - name: Save the paper account
+        run: |
+          git config user.name "paper-trader"
+          git config user.email "paper-trader@users.noreply.github.com"
+          git add state/
+          git diff --cached --quiet || (git commit -m "Paper trades $(date -u +%F\ %H:%M)" && git push)

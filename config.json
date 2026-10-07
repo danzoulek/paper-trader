@@ -1,0 +1,22 @@
+{
+  "mode": "paper",
+  "broker": "local",
+  "data_source": "free",
+  "starting_cash": 10000,
+
+  "symbols": ["SPY", "QQQ", "IWM", "DIA", "XLK", "XLF", "XLE", "XLV"],
+
+  "strategy": {
+    "name": "sma_trend",
+    "fast_days": 20,
+    "slow_days": 50
+  },
+
+  "risk": {
+    "max_position_pct": 0.15,
+    "max_invested_pct": 0.90,
+    "stop_loss_pct": 0.08,
+    "max_daily_loss_pct": 0.03,
+    "min_trade_dollars": 50
+  }
+}
