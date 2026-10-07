@@ -18,5 +18,14 @@
     "stop_loss_pct": 0.08,
     "max_daily_loss_pct": 0.03,
     "min_trade_dollars": 50
+  },
+
+  "live": {
+    "enabled": false,
+    "account_number": "",
+    "max_account_dollars": 500,
+    "max_order_dollars": 150,
+    "max_orders_per_run": 8,
+    "min_order_dollars": 5
   }
 }
