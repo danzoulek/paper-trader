@@ -1,2 +1,6 @@
 __pycache__/
 .env
+holdings.json
+market_data.json
+plan.json
+plan_card.json
