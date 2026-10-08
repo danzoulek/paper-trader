@@ -47,8 +47,11 @@ place no orders.
 >    `{"closes": {"SYM": [daily closes, oldest first]}, "prices": {"SYM": <last trade price>}}`.
 >    Use only completed days in `closes` (drop today's bar if present).
 > 6. Run `python -m trader.plan --holdings holdings.json --market-data market_data.json --out plan.json`.
-> 7. If `plan.json` status is `needs_approval`, place nothing yet. Post the
->    orders to Daniel in the paper-trader thread as a decision card
+> 7. If `plan.json` status is `needs_approval`, place nothing yet. First call
+>    `review_equity_order` for each order (same values as step 8). Post a
+>    reply listing each order with its `market_data_disclosure` copied
+>    verbatim (Robinhood requires it) and any `order_checks` alerts, then the
+>    decision card
 >    ("Place these orders?": Place / Skip), unless an earlier card with the
 >    same orders is still unanswered today. Only Daniel's own answer counts.
 >    When he picks Place, redo steps 3-6 with `--approved` and continue at
@@ -63,7 +66,9 @@ place no orders.
 >      `type: "market"`, `market_hours: "regular_hours"`, and either
 >      `dollar_amount` (buys) or `quantity` (sells) exactly as in the plan;
 >    - if the review shows any alert or a price more than 2% away from the
->      plan's price, skip that order and say why;
+>      plan's price, skip that order and say why (Daniel's Place on the card
+>      that showed the step-7 preview is his confirmation; this review is a
+>      final check);
 >    - otherwise call `place_equity_order` with the same values and a new
 >      UUID as `ref_id`.
 >    Stop at the first error. Never place an order that is not in
