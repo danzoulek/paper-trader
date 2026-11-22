@@ -6,8 +6,9 @@ It goes live only when Daniel says so, and only after he has:
 
 1. set `live.enabled` to `true` in `config.json`,
 2. put his agentic account number in `live.account_number`,
-3. kept `live.require_approval` on (Daniel approves each run's orders in the
-   thread, since the app's own trade-approval setting couldn't be found).
+3. set `live.require_approval` as he wants it. It was on until 2026-11-22,
+   when Daniel asked for the bot to run autonomously without per-run
+   approval; it is now off. The dollar limits in `live` still apply.
 
 Until then, `trader.plan` returns `dry_run` (or `blocked`) and this task
 places nothing.
@@ -66,9 +67,9 @@ place no orders.
 >      `type: "market"`, `market_hours: "regular_hours"`, and either
 >      `dollar_amount` (buys) or `quantity` (sells) exactly as in the plan;
 >    - if the review shows any alert or a price more than 2% away from the
->      plan's price, skip that order and say why (Daniel's Place on the card
->      that showed the step-7 preview is his confirmation; this review is a
->      final check);
+>      plan's price, skip that order and say why (with approval off, Daniel's
+>      2026-11-22 standing instruction is the confirmation; this review is
+>      the final check);
 >    - otherwise call `place_equity_order` with the same values and a new
 >      UUID as `ref_id`.
 >    Stop at the first error. Never place an order that is not in
