@@ -17,3 +17,4 @@ time,symbol,side,amount,ref_id,result
 2026-10-22T10:17:29-04:00,SPY,sell,9.65,6ada1af8-ec8d-4377-89ce-343045c6d257,filled 0.012609 @ 765.3925
 2026-11-25T09:33:01-05:00,XLV,buy,3.04,01a2131f-d028-7eb1-b654-c8f8543db3a3,approved by Daniel; filled 0.016658 @ 182.49
 2026-11-25T12:03:02-05:00,AMC,buy,3.04,6b0714c6-19fa-48a1-8e88-93887e3cfaf9,filled 0.995090 @ 3.055
+2026-11-25T12:32:16-05:00,XLF,buy,3.04,6b071ba0-b2c6-40a0-86c2-defbdd6a92d8,filled 0.054164 @ 56.125
