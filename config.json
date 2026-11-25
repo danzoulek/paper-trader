@@ -27,6 +27,6 @@
     "max_account_dollars": 500,
     "max_order_dollars": 150,
     "max_orders_per_run": 8,
-    "min_order_dollars": 5
+    "min_order_dollars": 1
   }
 }
